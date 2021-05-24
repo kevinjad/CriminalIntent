@@ -5,7 +5,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -46,9 +48,28 @@ class CrimeListFragment : Fragment() {
         crimeRecyclerView.adapter = crimeAdapter
     }
 
-    private inner class CrimeHolder(view: View) : RecyclerView.ViewHolder(view){
+    private inner class CrimeHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener{
+
+        lateinit var crime: Crime
         val crimeTitle: TextView = itemView.findViewById(R.id.crime_title)
         val crimeDate: TextView = itemView.findViewById(R.id.crime_date)
+        val solvedImageView: ImageView = itemView.findViewById(R.id.crime_solved)
+        fun bind(crime: Crime){
+            this.crime = crime
+            crimeTitle.text = this.crime.title
+            crimeDate.text = this.crime.date.toString()
+
+            solvedImageView.visibility = if(this.crime.isSolved){
+                View.VISIBLE
+            }
+            else{
+                View.GONE
+            }
+        }
+
+        override fun onClick(v: View?) {
+            Toast.makeText(context,"${this.crime.title} is pressed",Toast.LENGTH_SHORT).show()
+        }
     }
 
     private inner class CrimeAdapter(var crimes: List<Crime>): RecyclerView.Adapter<CrimeHolder>(){
@@ -58,10 +79,7 @@ class CrimeListFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: CrimeHolder, position: Int) {
-            holder.apply {
-                crimeDate.text = crimes[position].date.toString()
-                crimeTitle.text = crimes[position].title
-            }
+            holder.bind(crimes[position])
         }
 
         override fun getItemCount(): Int = crimes.size
